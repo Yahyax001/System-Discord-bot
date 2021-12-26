@@ -1,0 +1,49 @@
+const Discord = require('discord.js');
+require('discord-reply');
+const { MessageEmbed } = require("discord.js");
+const canvacord = require("canvacord")
+
+module.exports = { 
+  name: "comment",
+  description: "Get a custom comment",
+  usage: "`a!comment <customtext>`",
+  aliases: ["cm"],
+  cooldown: 5000,
+  category: "Image",
+  run: async (client, message, args) => {
+    
+    let yee = false
+        message.channel.startTyping()
+        let avatar = message.author.displayAvatarURL({ dynamic: false, format: 'png' });
+        let image = await canvacord.Canvas.youtube({
+            username: message.author.username,
+            content: args.join(' '),
+            avatar: avatar
+        }).catch((err) => {
+            yee = true
+            message.channel.stopTyping()
+            return message.lineReply(err.toString())
+  
+        });
+				let msg = args.join(" ");
+        if (!msg) {
+            return message.reply("What is your comment?");
+        }
+				
+        if(!yee) {
+            let attachment = new Discord.MessageAttachment(image, "Comment.png");
+            message.lineReply({ embed: { description: "Commenting..."}}).then((msg) => {
+      setTimeout(function() {
+        msg.delete().then((msg) => {
+          message.lineReply(attachment)
+        })
+      }, 5000)
+    });
+		
+            message.channel.stopTyping()
+    
+  }
+    
+  }
+  
+};
